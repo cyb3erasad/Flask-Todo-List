@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>To-Do List</title>
+    <style>
+        body {
+            font-family: Arial;
+            margin: 50px;
+        }
+
+        .completed {
+            text-decoration: line-through;
+            color: gray;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>My To-Do List</h1>
+
+    <form action="/add" method="POST">
+        <input type="text" name="title" placeholder="Enter task..." required>
+        <button type="submit">Add</button>
+    </form>
+
+    <ul>
+        {% for task in tasks %}
+        <li>
+            <span class="{% if task.complete %}completed{% endif %}">
+                {{ task.title }}
+            </span>
+
+            {% if not task.completed %}
+            <a href="/complete/{{ task.id }}">Complete</a>
+            {% endif %}
+            <a href="/delete/{{ task.id }}">Delete</a>
+        </li>
+        {% endfor %}
+    </ul>
+
+</body>
+
+</html>
