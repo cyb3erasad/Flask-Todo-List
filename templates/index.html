@@ -51,10 +51,14 @@
                 </span>
 
                 <div>
-                    {% if not task.completed %}
+                    <a href="/edit/{{ task.id }}" class="btn btn-primary btn-sm">Edit</a>
+
+                    {% if not task.complete %}
                     <a href="/complete/{{ task.id }}" class="btn btn-success btn-sm">Complete</a>
                     {% endif %}
+
                     <a href="/delete/{{ task.id }}" class="btn btn-danger btn-sm">Delete</a>
+
                 </div>
             </li>
             {% endfor %}

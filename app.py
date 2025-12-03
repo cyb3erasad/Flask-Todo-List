@@ -95,7 +95,19 @@ def complete_task(id):
 
     return redirect("/")
 
+@app.route("/edit/<int:id>", methods=["GET", "POST"])
+@login_required
+def edit_task(id):
+    task = Task.query.get_or_404(id)
 
+    if task.user_id != current_user.id:
+        return "Unauthorized", 403
+    
+    if request.method == "POST":
+        task.title = request.form["title"]
+        db.session.commit()
+        return redirect("/")
+    return render_template("edit.html", task=task)
 
 if __name__ == "__main__":
     app.run(debug=True)
