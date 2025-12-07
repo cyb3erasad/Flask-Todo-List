@@ -1,97 +1,227 @@
-📌 Flask To-Do List Application — Documentation
+# Flask Todo List App Documentation
 
-A simple and modern To-Do List web application built using Flask, SQLAlchemy, Flask-Login, and Bootstrap.
-Users can register, log in, add tasks, edit tasks, mark them as complete, and delete tasks.
+## Overview
 
-🚀 Features
-🔐 User Authentication
+A full-featured todo list web application built with Flask that includes user authentication, task management (add, edit, delete, complete), and a responsive UI using Bootstrap and custom CSS.
 
-User Registration
+## Features
 
-User Login
+- **User Authentication**: Secure registration and login system with password hashing
+- **Task Management**:
+  - Add new tasks
+  - Edit existing tasks
+  - Delete tasks
+  - Mark tasks as complete (with visual highlighting)
+- **User-specific Data**: Each user has their own isolated todo list
+- **Responsive Design**: Bootstrap-based UI with custom styling
 
-Password hashing using Flask-Bcrypt
+## Tech Stack
 
-Session management with Flask-Login
+- **Backend**: Flask (Python web framework)
+- **Database**: SQLite with Flask-SQLAlchemy ORM
+- **Authentication**: Flask-Login for session management
+- **Password Security**: Werkzeug for password hashing
+- **Frontend**: Bootstrap 5, Custom CSS
+- **Template Engine**: Jinja2
 
-Only logged-in users can access or modify their tasks
+## Project Structure
 
-Each user has their own separate tasks
-
-
-📝 Task Management
-
-Add new tasks
-
-Mark tasks as complete
-
-Edit task title
-
-Delete tasks
-
-Completed tasks are visually highlighted
-
-Tasks are connected to the user via user_id
-
-
-🎨 Beautiful UI
-
-Built with modern Bootstrap 5 and custom CSS:
-
-Gradient backgrounds
-
-Rounded cards
-
-Smooth animations
-
-Clean typography
-
-Responsive on all screen sizes
-
+```
 /project
 │
-├── app.py
-├── models.py          <-- (added)
-├── requirements.txt
-├── .env               <-- optional, for SECRET_KEY
-├── /templates
-│      ├── register.html
-│      ├── login.html
-│      ├── home.html
-│      ├── edit.html
+├── app.py                 # Main application file with routes
+├── models.py              # Database models (User, Todo)
+├── requirements.txt       # Python dependencies
+├── .env                   # Environment variables (SECRET_KEY)
 │
-└── /static
-       ├── style.css
-       └── (other assets)
+├── /instance              # Instance folder (auto-generated)
+│   └── todos.db           # SQLite database file
+│
+├── /templates             # HTML templates
+│   ├── register.html      # User registration page
+│   ├── login.html         # User login page
+│   ├── home.html          # Main todo list page
+│   └── edit.html          # Edit task page
+│
+```
+
+## Installation & Setup
+
+### Prerequisites
+
+- Python 3.7 or higher
+- pip (Python package manager)
 
 
-⚙️ Installation & Setup
-1. Clone the project
-git clone https://github.com/cyb3erasad/Flask-Todo-List.git
-cd project
+## Dependencies
+
+The `requirements.txt` file should include:
+
+```
+Flask==3.0.0
+Flask-SQLAlchemy==3.1.1
+Flask-Login==0.6.3
+python-dotenv==1.0.0
+```
+
+## Database Schema
+
+### User Model
+
+| Field          | Type    | Description                    |
+|----------------|---------|--------------------------------|
+| id             | Integer | Primary key                    |
+| username       | String  | Unique username (max 80 chars) |
+| password_hash  | String  | Hashed password (max 120 chars)|
+| todos          | Relationship | One-to-many with Todo  |
+
+### Todo Model
+
+| Field       | Type     | Description                          |
+|-------------|----------|--------------------------------------|
+| id          | Integer  | Primary key                          |
+| content     | String   | Task description (max 200 chars)     |
+| completed   | Boolean  | Task completion status (default: False) |
+| created_at  | DateTime | Timestamp when task was created      |
+| user_id     | Integer  | Foreign key to User                  |
+| user        | Relationship | Many-to-one with User            |
+
+## Application Routes
+
+### Authentication Routes
+
+- **GET/POST `/register`**: User registration
+  - Displays registration form
+  - Creates new user account with hashed password
+  - Redirects to login on success
+
+- **GET/POST `/login`**: User login
+  - Displays login form
+  - Authenticates user credentials
+  - Creates user session
+  - Redirects to home page on success
+
+- **GET `/logout`**: User logout
+  - Ends user session
+  - Redirects to login page
+
+### Todo Management Routes
+
+- **GET/POST `/`** (home): Main todo list page
+  - Displays all user's tasks
+  - Handles adding new tasks via POST
+  - Shows completed tasks with highlighting
+  - Requires authentication
+
+- **GET/POST `/edit/<id>`**: Edit task
+  - Displays edit form for specific task
+  - Updates task content via POST
+  - Redirects to home on success
+  - Requires authentication and task ownership
+
+- **GET `/delete/<id>`**: Delete task
+  - Removes specified task from database
+  - Redirects to home page
+  - Requires authentication and task ownership
+
+- **GET `/complete/<id>`**: Toggle task completion
+  - Toggles completed status (True/False)
+  - Updates task in database
+  - Redirects to home page
+  - Requires authentication and task ownership
+
+## Key Features Explained
+
+### User Authentication
+
+- Passwords are hashed using Werkzeug's `generate_password_hash()` before storage
+- Flask-Login manages user sessions and provides decorators like `@login_required`
+- Each user can only access their own tasks
+
+### Complete Feature
+
+When a task is marked as complete:
+1. User clicks complete button/link on home page
+2. Route `/complete/<id>` toggles the `completed` boolean field
+3. Template conditionally applies CSS class (e.g., `completed-task`)
+4. CSS provides visual feedback (strikethrough, different background, etc.)
+
+### Database Location
+
+The SQLite database file `todos.db` is automatically created in the `/instance` folder. This folder is:
+- Auto-generated by Flask
+- Listed in `.gitignore` (database shouldn't be committed)
+- Contains instance-specific data
+
+## Frontend Structure
+
+### Bootstrap Integration
+
+Bootstrap 5 is used for:
+- Responsive grid layout
+- Form styling
+- Button components
+- Navigation elements
+- Alert messages
+
+### Custom CSS (`style.css`)
+
+Custom styles typically include:
+- Completed task styling (strikethrough, opacity, background)
+- Layout adjustments
+- Color scheme customization
+- Hover effects
+- Responsive design tweaks
+
+### Template Inheritance
+
+Templates likely use Jinja2 template inheritance:
+- Base template with common elements (navbar, footer)
+- Child templates extend base and fill content blocks
+
+## Security Considerations
+
+1. **Password Hashing**: All passwords are hashed, never stored as plain text
+2. **Session Management**: Flask-Login handles secure session cookies
+3. **SECRET_KEY**: Used for session encryption, should be kept secret
+4. **CSRF Protection**: Consider adding Flask-WTF for CSRF tokens in production
+5. **SQL Injection**: SQLAlchemy ORM prevents SQL injection attacks
+6. **Authentication Required**: Protected routes use `@login_required` decorator
+
+## Common Tasks
+
+### Adding a New Feature
+
+1. Update `models.py` if database changes needed
+2. Add route in `app.py`
+3. Create/update template in `/templates`
+4. Add styling in `style.css`
+5. Test thoroughly
+
+### Database Migration
+
+If you modify models:
+1. Delete existing `instance/todos.db`
+2. Run the application to recreate database
+3. Or use Flask-Migrate for production environments
 
 
-2. Create Virtual Environment
-    python -m venv venv
-    venv\Scripts\activate   
+## Future Enhancements
 
-3. Install dependencies
-    pip install -r requirements.txt
+Potential features to add:
+- Due dates and reminders
+- Task categories/tags
+- Search and filter functionality
+- Task sharing between users
+- Email notifications
+- Dark mode toggle
+- Task statistics/analytics
 
-💡 Conclusion
 
-This project is a great introduction to Flask, covering:
+## Contact
 
-Routing
+https://github.com/cyb3erasad/Flask-Todo-List
 
-Templates
+---
 
-Authentication
-
-Database relationships
-
-UI design
-
-CRUD operations
-
-It can be used as a portfolio project or extended into a full productivity app.
+**Last Updated**: December 2025
